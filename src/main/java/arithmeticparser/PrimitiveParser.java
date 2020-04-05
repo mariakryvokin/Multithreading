@@ -22,7 +22,7 @@ public class PrimitiveParser implements Parser {
             if (isOperator) {
                 result = addOperatorToStackOrResult(result, operators, partOfExpression);
             } else {
-                if(Character.isAlphabetic(partOfExpression.charAt(0))){
+                if (Character.isAlphabetic(partOfExpression.charAt(0))) {
                     parameters.add(partOfExpression);
                 }
                 result += partOfExpression;
@@ -48,17 +48,17 @@ public class PrimitiveParser implements Parser {
         return result;
     }
 
-    public Future<Integer> specifyParameter(String parameterName){
+    public Future<Integer> specifyParameter(String parameterName) {
         System.out.println("specify parameter " + parameterName);
-            return executorService.submit(()-> {
-                String lineWithParameter = scanner.nextLine().replaceAll(" ","");
-                String[] variableAndValue = lineWithParameter.split("=");
-                return Integer.valueOf(variableAndValue[1]);
-            });
+        return executorService.submit(() -> {
+            String lineWithParameter = scanner.nextLine().replaceAll(" ", "");
+            String[] variableAndValue = lineWithParameter.split("=");
+            return Integer.valueOf(variableAndValue[1]);
+        });
     }
 
     @Override
-    public void finalize() throws Throwable {
+    public void finalize() {
         scanner.close();
         executorService.shutdown();
     }
