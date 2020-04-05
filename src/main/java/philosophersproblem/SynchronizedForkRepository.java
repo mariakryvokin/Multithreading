@@ -1,3 +1,5 @@
+package philosophersproblem;
+
 public class SynchronizedForkRepository implements ForkRepository {
 
     @Override

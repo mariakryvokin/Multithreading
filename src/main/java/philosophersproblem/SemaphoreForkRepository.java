@@ -1,13 +1,15 @@
-public class LockForkRepository implements ForkRepository {
+package philosophersproblem;
+
+public class SemaphoreForkRepository implements ForkRepository {
 
     @Override
     public long eat(Fork leftFork, Fork rightFork, long time, boolean takeRightForkFirst) {
         long startTime = 0;
         try {
             if (takeRightForkFirst) {
-                getForks(rightFork, leftFork);
+                lockForks(rightFork, leftFork);
             } else {
-                getForks(leftFork, rightFork);
+                lockForks(leftFork, rightFork);
             }
             startTime = System.currentTimeMillis();
             LOGGER.info(leftFork + " and " + rightFork + " taken");
@@ -22,12 +24,12 @@ public class LockForkRepository implements ForkRepository {
     }
 
     private void releaseForks(Fork leftFork, Fork rightFork) {
-        rightFork.getLock().unlock();
-        leftFork.getLock().unlock();
+        leftFork.getSemaphore().release();
+        rightFork.getSemaphore().release();
     }
 
-    private void getForks(Fork firstFork, Fork secondFork) {
-        firstFork.getLock().lock();
-        secondFork.getLock().lock();
+    private void lockForks(Fork firstFork, Fork secondFork) throws InterruptedException {
+        firstFork.getSemaphore().acquire(1);
+        secondFork.getSemaphore().acquire(1);
     }
 }

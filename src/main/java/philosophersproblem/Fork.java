@@ -1,3 +1,5 @@
+package philosophersproblem;
+
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -22,7 +24,7 @@ public class Fork {
 
     @Override
     public String toString() {
-        return "Fork{" +
+        return " Fork{" +
                 "numberOfFork=" + numberOfFork +
                 '}';
     }
