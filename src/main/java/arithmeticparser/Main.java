@@ -1,12 +1,16 @@
 package arithmeticparser;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.concurrent.Future;
 
 public class Main {
 
     private static String expression = "3 + a * 2 / b - 5";
+    private static Logger logger = LogManager.getLogger();
 
-    public static void main(String[] args) throws Throwable {
+    public static void main(String[] args){
         PrimitiveParser parser = new PrimitiveParser();
         String expressionInPolishNotation = parser.createReversePolishNotation(expression);
         System.out.println("Please enter parameters for expression " + expression);
@@ -16,12 +20,11 @@ public class Main {
                 Future<Integer> value = parser.specifyParameter(parameter);
                 expressionInPolishNotation = expressionInPolishNotation.replace(parameter, String.valueOf(value.get()));
             }catch (Exception e){
-                System.out.println("specify parameter in format: {paremeter_name} = {number_value}");
+                logger.error(e.getMessage());
                 i--;
             }
         }
         parser.closeResources();
-        System.out.println(expressionInPolishNotation);
         Calculator calculator = new Calculator();
         System.out.println(calculator.calculate(expressionInPolishNotation));
 

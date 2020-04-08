@@ -51,6 +51,9 @@ public class PrimitiveParser {
         System.out.println("specify parameter " + parameterName);
         return executorService.submit(() -> {
             String lineWithParameter = scanner.nextLine().replaceAll(" ", "");
+            if(!lineWithParameter.matches(parameterName+"=\\d")){
+                throw new WrongInputException("specify parameter in format: {paremeter_name} = {number_value}");
+            }
             String[] variableAndValue = lineWithParameter.split("=");
             return Integer.valueOf(variableAndValue[1]);
         });
