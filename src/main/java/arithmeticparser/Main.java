@@ -18,21 +18,19 @@ public class Main {
     public static void main(String[] args) {
         PrimitiveParser parser = new PrimitiveParser();
         String expressionInPolishNotation = parser.createReversePolishNotation(expression);
-        CompletableFuture<Map<String, Integer>>[] allParameters = getParametersFromClient(parser);
+        CompletableFuture<Map<String, Integer>>[] parametersAndValues = getParametersFromClient(parser);
         logger.info("I am going to calculate");
-        calculate(parser, expressionInPolishNotation, allParameters);
+        calculate(parser, expressionInPolishNotation, parametersAndValues);
     }
 
-    private static void calculate(PrimitiveParser parser, String expressionInPolishNotation, CompletableFuture<Map<String, Integer>>[] allParameters) {
-        CompletableFuture.allOf(allParameters).thenRunAsync(()-> {
+    private static void calculate(PrimitiveParser parser, String expressionInPolishNotation, CompletableFuture<Map<String, Integer>>[] parametersAndValues) {
+        CompletableFuture.allOf(parametersAndValues).thenRunAsync(()-> {
             logger.info("I am calculating");
             Calculator calculator = new Calculator();
             try {
-                logger.info(calculator.calculate( replaceParametersWithValues(parser, expressionInPolishNotation, allParameters)));
-            } catch (InterruptedException e) {
+                logger.info(calculator.calculate( replaceParametersWithValues(parser, expressionInPolishNotation, parametersAndValues)));
+            } catch (InterruptedException | ExecutionException e) {
                logger.error(e.getMessage(),e);
-            } catch (ExecutionException e) {
-                logger.error(e.getMessage(),e);
             }
             parser.closeResources();
             executorService.shutdown();
