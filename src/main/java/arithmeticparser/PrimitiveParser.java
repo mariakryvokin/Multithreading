@@ -1,14 +1,18 @@
 package arithmeticparser;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class PrimitiveParser {
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private List<String> parameters = new ArrayList<>();
+    private static Logger logger = LogManager.getLogger();
     private Scanner scanner = new Scanner(System.in);
 
     public String createReversePolishNotation(String expression) {
@@ -47,20 +51,31 @@ public class PrimitiveParser {
         return result;
     }
 
-    public Future<Integer> specifyParameter(String parameterName) {
-        System.out.println("specify parameter " + parameterName);
-        return executorService.submit(() -> {
-            String lineWithParameter = scanner.nextLine().replaceAll(" ", "");
-            if(!lineWithParameter.matches(parameterName+"=\\d")){
-                throw new WrongInputException("specify parameter in format: {paremeter_name} = {number_value}");
-            }
-            String[] variableAndValue = lineWithParameter.split("=");
-            return Integer.valueOf(variableAndValue[1]);
-        });
+    public CompletableFuture<Map<String, Integer>> specifyParameter(String parameterName) {
+        return CompletableFuture.supplyAsync(() -> {
+            Map<String, Integer> parameterNameAndValue = new HashMap<>();
+            String[] variableAndValue = getValueFromClient(parameterName);
+            parameterNameAndValue.put(parameterName, Integer.valueOf(variableAndValue[1]));
+            return parameterNameAndValue;
+        }, executorService);
+
+    }
+
+    private String[] getValueFromClient(String parameterName) {
+        logger.info("specify parameter " + parameterName);
+        String lineWithParameter = scanner.nextLine().replaceAll(" ", "");
+        verifyInput(parameterName, lineWithParameter);
+        return lineWithParameter.split("=");
+    }
+
+    private void verifyInput(String parameterName, String lineWithParameter) {
+        if (!lineWithParameter.matches(parameterName + "=\\d")) {
+            throw new WrongInputException("specify parameter in format: {paremeter_name} = {number_value}");
+        }
     }
 
     public void closeResources() {
-        scanner.close();
         executorService.shutdown();
+        scanner.close();
     }
 }
