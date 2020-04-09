@@ -3,11 +3,11 @@ package philosophersproblem;
 public class SynchronizedForkRepository implements ForkRepository {
 
     @Override
-    public long eat(Fork leftFork, Fork rightFork, long time, boolean takeRightForkFirst) {
-        return takeRightForkFirst ? eat(rightFork, leftFork, time) : eat(leftFork, rightFork, time);
+    public long eat(Fork leftFork, Fork rightFork, long eatTime) {
+        return takeForks(leftFork, rightFork, eatTime);
     }
 
-    private long eat(Fork firstFork, Fork secondFork, long time) {
+    private long takeForks(Fork firstFork, Fork secondFork, long time) {
         synchronized (firstFork) {
             synchronized (secondFork) {
                 long startTime = System.currentTimeMillis();

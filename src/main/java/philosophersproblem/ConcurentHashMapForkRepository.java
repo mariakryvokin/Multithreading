@@ -9,19 +9,17 @@ public class ConcurentHashMapForkRepository implements ForkRepository {
 
 
     @Override
-    public long eat(Fork leftFork, Fork rightFork, long time, boolean takeRightForkFirst) {
+    public long eat(Fork leftFork, Fork rightFork, long eatTime) {
         long startTime = 0;
         try {
-            if (takeRightForkFirst) {
-                getForks(rightFork, leftFork, time / 2);
-            } else {
-                getForks(leftFork, rightFork, time / 2);
+            if (!getForks(leftFork, rightFork, eatTime / 2)) {
+                getForks(leftFork, rightFork, eatTime / 2);
             }
             startTime = System.currentTimeMillis();
             LOGGER.info(leftFork + " and " + rightFork + " taken");
-            Thread.sleep(time);
+            Thread.sleep(eatTime);
         } catch (InterruptedException e) {
-           LOGGER.error(e.getMessage(),e);
+            LOGGER.error(e.getMessage(), e);
         } finally {
             releaseForks(leftFork, rightFork);
         }
@@ -35,13 +33,14 @@ public class ConcurentHashMapForkRepository implements ForkRepository {
     }
 
 
-    public void getForks(Fork firstFork, Fork secondFork, long time) throws InterruptedException {
+    public boolean getForks(Fork firstFork, Fork secondFork, long waitingTime) throws InterruptedException {
         if (takenForks.putIfAbsent(firstFork, true) == null) {
-            while (takenForks.putIfAbsent(secondFork, true) == null) {
+            while (takenForks.putIfAbsent(secondFork, true) != null) {
+                Thread.sleep(waitingTime);
             }
+            return true;
         } else {
-            Thread.sleep(time);
-            getForks(firstFork, secondFork, time);
+            return false;
         }
     }
 }

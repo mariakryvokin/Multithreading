@@ -31,7 +31,12 @@ public class Philosopher implements Runnable {
     public void eat(){
         LOGGER.info(" " + this + "going to eat");
         long startOfGrabingTime = System.currentTimeMillis();
-        long startOfEatingTime = forkRepository.eat(leftFork, rightFork, eatTime, deadlockBreaker);
+        if (deadlockBreaker) {
+            Fork temp = leftFork;
+            leftFork = rightFork;
+            rightFork = temp;
+        }
+        long startOfEatingTime = forkRepository.eat(leftFork, rightFork, eatTime);
         hungryTime = startOfEatingTime - startOfGrabingTime;
         LOGGER.info(" " + this + "ends eat");
     }
@@ -52,7 +57,7 @@ public class Philosopher implements Runnable {
 
     @Override
     public String toString() {
-        return "philosophersproblem.Philosopher{" +
+        return "Philosopher{" +
                 "id=" + id +
                 '}';
     }

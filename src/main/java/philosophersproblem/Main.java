@@ -13,10 +13,10 @@ public class Main {
         int capacity = 5;
         long eatTime = 2000;
         long talkTime = 1000;
-        ForkRepository forkRepository = new SynchronizedForkRepository();
-       // philosophersproblem.ForkRepository forkRepository = new philosophersproblem.ConcurentHashMapForkRepository();
-        //philosophersproblem.ForkRepository forkRepository = new philosophersproblem.SemaphoreForkRepository();
-        //  philosophersproblem.ForkRepository forkRepository = new philosophersproblem.LockForkRepository();
+       // ForkRepository forkRepository = new SynchronizedForkRepository();
+        //ForkRepository forkRepository = new ConcurentHashMapForkRepository();
+        // ForkRepository forkRepository = new SemaphoreForkRepository();
+        ForkRepository forkRepository = new LockForkRepository();
         List<Fork> forks = new ArrayList(capacity);
         for (int i = 0; i < capacity; i++) {
             forks.add(new Fork(i));

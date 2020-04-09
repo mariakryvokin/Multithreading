@@ -3,17 +3,13 @@ package philosophersproblem;
 public class SemaphoreForkRepository implements ForkRepository {
 
     @Override
-    public long eat(Fork leftFork, Fork rightFork, long time, boolean takeRightForkFirst) {
+    public long eat(Fork leftFork, Fork rightFork, long eatTime) {
         long startTime = 0;
         try {
-            if (takeRightForkFirst) {
-                lockForks(rightFork, leftFork);
-            } else {
-                lockForks(leftFork, rightFork);
-            }
+            lockForks(leftFork, rightFork);
             startTime = System.currentTimeMillis();
             LOGGER.info(leftFork + " and " + rightFork + " taken");
-            Thread.sleep(time);
+            Thread.sleep(eatTime);
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
         } finally {

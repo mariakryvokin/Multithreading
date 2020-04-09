@@ -3,17 +3,13 @@ package philosophersproblem;
 public class LockForkRepository implements ForkRepository {
 
     @Override
-    public long eat(Fork leftFork, Fork rightFork, long time, boolean takeRightForkFirst) {
+    public long eat(Fork leftFork, Fork rightFork, long eatTime) {
         long startTime = 0;
         try {
-            if (takeRightForkFirst) {
-                getForks(rightFork, leftFork);
-            } else {
-                getForks(leftFork, rightFork);
-            }
+            getForks(leftFork, rightFork);
             startTime = System.currentTimeMillis();
             LOGGER.info(leftFork + " and " + rightFork + " taken");
-            Thread.sleep(time);
+            Thread.sleep(eatTime);
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
         } finally {
