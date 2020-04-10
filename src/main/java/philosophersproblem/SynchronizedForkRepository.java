@@ -12,9 +12,9 @@ public class SynchronizedForkRepository implements ForkRepository {
             synchronized (secondFork) {
                 long startTime = System.currentTimeMillis();
                 try {
-                    LOGGER.info(firstFork + " and " + secondFork + " taken");
+                    LOGGER.info("{} and {} taken", firstFork, secondFork);
                     Thread.sleep(time);
-                    LOGGER.info(firstFork + " and " + secondFork + " released");
+                    LOGGER.info("{} and {} released", firstFork, secondFork);
                 } catch (InterruptedException e) {
                     LOGGER.error(e.getMessage(), e);
                 }

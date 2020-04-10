@@ -62,7 +62,7 @@ public class PrimitiveParser {
     }
 
     private String[] getValueFromClient(String parameterName) {
-        logger.info("specify parameter " + parameterName);
+        logger.info("specify parameter {}", parameterName);
         String lineWithParameter = scanner.nextLine().replaceAll(" ", "");
         verifyInput(parameterName, lineWithParameter);
         return lineWithParameter.split("=");

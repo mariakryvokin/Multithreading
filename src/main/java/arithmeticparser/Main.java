@@ -12,43 +12,45 @@ import java.util.concurrent.Executors;
 
 public class Main {
 
-    private static String expression = "3 + a * 2 / b - 5";
-    private static Logger logger = LogManager.getLogger();
-    private static ExecutorService executorService = Executors.newFixedThreadPool(2);
+    private static final String EXPRESSION = "3 + a * 2 / b - 5";
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
 
     public static void main(String[] args) {
         PrimitiveParser parser = new PrimitiveParser();
-        String expressionInPolishNotation = parser.createReversePolishNotation(expression);
+        String expressionInPolishNotation = parser.createReversePolishNotation(EXPRESSION);
         CompletableFuture<Map<String, Integer>>[] parametersAndValues = getParametersFromClient(parser);
-        logger.info("I am going to calculate");
+        LOGGER.info("I am going to calculate");
         calculate(parser, expressionInPolishNotation, parametersAndValues);
     }
 
     private static void calculate(PrimitiveParser parser, String expressionInPolishNotation,
                                   CompletableFuture<Map<String, Integer>>[] parametersAndValues) {
-        logger.info("I so close to calculating");
+        LOGGER.info("I so close to calculating");
         CompletableFuture.allOf(parametersAndValues).thenRunAsync(() -> {
-            logger.info("I am calculating");
+            LOGGER.info("I am calculating");
             Calculator calculator = new Calculator();
             try {
-                logger.info(calculator.calculate(replaceParametersWithValues(parser, expressionInPolishNotation,
+                LOGGER.info(calculator.calculate(replaceParametersWithValues(parser, expressionInPolishNotation,
                         parametersAndValues)));
             } catch (InterruptedException | ExecutionException e) {
-                logger.error(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
+            }finally {
+                parser.closeResources();
+                EXECUTOR_SERVICE.shutdown();
             }
-            parser.closeResources();
-            executorService.shutdown();
-        }, executorService);
+        }, EXECUTOR_SERVICE);
     }
 
     private static CompletableFuture<Map<String, Integer>>[] getParametersFromClient(PrimitiveParser parser) {
-        logger.info("Please enter parameters for expression " + expression);
+        LOGGER.info("Please enter parameters for EXPRESSION {}", EXPRESSION);
         CompletableFuture<Map<String, Integer>>[] allParameters = new CompletableFuture[parser.getParameters().size()];
         for (int i = 0; i < parser.getParameters().size(); i++) {
-            logger.info(i +" parameter: ");
+            LOGGER.info(i +" parameter: ");
             String parameterName = parser.getParameters().get(i);
             allParameters[i] = parser.specifyParameter(parameterName)
-                    .exceptionally(e->{logger.error(e.getMessage());
+                    .exceptionally(e->{
+                        LOGGER.error(e.getMessage());
                     return Collections.singletonMap(parameterName, 1);});
         }
         return allParameters;

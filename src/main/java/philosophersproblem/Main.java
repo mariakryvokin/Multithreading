@@ -14,9 +14,9 @@ public class Main {
         long eatTime = 2000;
         long talkTime = 1000;
        // ForkRepository forkRepository = new SynchronizedForkRepository();
-        //ForkRepository forkRepository = new ConcurentHashMapForkRepository();
+        ForkRepository forkRepository = new ConcurentHashMapForkRepository();
         // ForkRepository forkRepository = new SemaphoreForkRepository();
-        ForkRepository forkRepository = new LockForkRepository();
+       // ForkRepository forkRepository = new LockForkRepository();
         List<Fork> forks = new ArrayList(capacity);
         for (int i = 0; i < capacity; i++) {
             forks.add(new Fork(i));

@@ -3,10 +3,12 @@ package philosophersproblem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.concurrent.TimeUnit;
+
 public class Philosopher implements Runnable {
 
     private int id;
-    private int amountOfEatTalkCircles = 1;
+    private int amountOfEatTalkCircles = 4;
     private boolean deadlockBreaker;
     private long eatTime;
     private long talkTime;
@@ -29,26 +31,26 @@ public class Philosopher implements Runnable {
     }
 
     public void eat(){
-        LOGGER.info(" " + this + "going to eat");
+        LOGGER.info("{} going to eat", this);
         long startOfGrabingTime = System.currentTimeMillis();
         if (deadlockBreaker) {
-            Fork temp = leftFork;
+            Fork swap = leftFork;
             leftFork = rightFork;
-            rightFork = temp;
+            rightFork = swap;
         }
         long startOfEatingTime = forkRepository.eat(leftFork, rightFork, eatTime);
-        hungryTime = startOfEatingTime - startOfGrabingTime;
-        LOGGER.info(" " + this + "ends eat");
+        hungryTime += startOfEatingTime - startOfGrabingTime;
+        LOGGER.info("{} ends eat", this);
     }
 
     public void talk(){
-        LOGGER.info(" " + this + "starts talking");
+        LOGGER.info("{} starts talking", this);
         try {
             Thread.sleep(talkTime);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        LOGGER.info(" " + this + "ends talking");
+        LOGGER.info("{} ends talking",this);
     }
 
     public void setAmountOfEatTalkCircles(int amountOfEatTalkCircles) {
@@ -67,6 +69,6 @@ public class Philosopher implements Runnable {
             eat();
             talk();
         }
-        LOGGER.info("Total hungry seconds " + hungryTime/1000);
+        LOGGER.info("Total hungry milliseconds {}",  hungryTime);
     }
 }

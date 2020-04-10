@@ -8,12 +8,12 @@ public class LockForkRepository implements ForkRepository {
         try {
             getForks(leftFork, rightFork);
             startTime = System.currentTimeMillis();
-            LOGGER.info(leftFork + " and " + rightFork + " taken");
+            LOGGER.info("{} and {} taken", leftFork, rightFork);
             Thread.sleep(eatTime);
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
         } finally {
-            LOGGER.info(leftFork + " and " + rightFork + " released");
+            LOGGER.info("{} and {} released", leftFork, rightFork);
             releaseForks(leftFork, rightFork);
         }
         return startTime;
