@@ -3,8 +3,8 @@ package treetraverseforkjointask;
 import java.util.List;
 
 public class TreeNode {
-    private List<TreeNode> children;
-    private boolean isVisited;
+    private final List<TreeNode> children;
+    private volatile boolean isVisited;
 
     public TreeNode(List<TreeNode> children, boolean isVisited) {
         this.children = children;
