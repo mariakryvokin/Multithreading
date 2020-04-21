@@ -51,21 +51,25 @@ public class PrimitiveParser {
         return result;
     }
 
-    public CompletableFuture<Map<String, Integer>> specifyParameter(String parameterName) {
-        return CompletableFuture.supplyAsync(() -> {
-            Map<String, Integer> parameterNameAndValue = new HashMap<>();
-            String[] variableAndValue = getValueFromClient(parameterName);
-            parameterNameAndValue.put(parameterName, Integer.valueOf(variableAndValue[1]));
-            return parameterNameAndValue;
-        }, executorService);
-
+    public CompletableFuture<Map<String, Integer>> specifyParameter() {
+        return CompletableFuture.supplyAsync(() -> getValueFromClient(), executorService);
     }
 
-    private String[] getValueFromClient(String parameterName) {
-        logger.info("specify parameter {}", parameterName);
-        String lineWithParameter = scanner.nextLine().replaceAll(" ", "");
-        verifyInput(parameterName, lineWithParameter);
-        return lineWithParameter.split("=");
+
+    private Map<String, Integer> getValueFromClient(){
+        Map<String, Integer> parametersAndValues =  new HashMap<>();
+            for (int i = 0; i < parameters.size(); i++) {
+                logger.info("specify parameter {}", parameters.get(i));
+                String lineWithParameter = scanner.nextLine().replaceAll(" ", "");
+                try {
+                    verifyInput(parameters.get(i), lineWithParameter);
+                    parametersAndValues.put(parameters.get(i),Integer.valueOf(lineWithParameter.split("=")[1]));
+                } catch (WrongInputException e) {
+                    logger.error(e.getMessage());
+                    i--;
+                }
+            }
+        return parametersAndValues;
     }
 
     private void verifyInput(String parameterName, String lineWithParameter) {

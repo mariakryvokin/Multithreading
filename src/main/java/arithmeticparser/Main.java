@@ -3,7 +3,6 @@ package arithmeticparser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -19,20 +18,20 @@ public class Main {
     public static void main(String[] args) {
         PrimitiveParser parser = new PrimitiveParser();
         String expressionInPolishNotation = parser.createReversePolishNotation(EXPRESSION);
-        CompletableFuture<Map<String, Integer>>[] parametersAndValues = getParametersFromClient(parser);
         LOGGER.info("I am going to calculate");
-        calculate(parser, expressionInPolishNotation, parametersAndValues);
+        calculate(parser, expressionInPolishNotation);
     }
 
-    private static void calculate(PrimitiveParser parser, String expressionInPolishNotation,
-                                  CompletableFuture<Map<String, Integer>>[] parametersAndValues) {
+    private static void calculate(PrimitiveParser parser, String expressionInPolishNotation) {
         LOGGER.info("I so close to calculating");
-        CompletableFuture.allOf(parametersAndValues).thenRunAsync(() -> {
+        LOGGER.info("Please enter parameters for EXPRESSION {}", EXPRESSION);
+        CompletableFuture<Map<String, Integer>> parametersAndValues = parser.specifyParameter();
+        parametersAndValues.thenRunAsync(() -> {
             LOGGER.info("I am calculating");
             Calculator calculator = new Calculator();
             try {
-                LOGGER.info(calculator.calculate(replaceParametersWithValues(parser, expressionInPolishNotation,
-                        parametersAndValues)));
+                LOGGER.info(calculator.calculate(replaceParametersWithValues(expressionInPolishNotation,
+                        parametersAndValues.get())));
             } catch (InterruptedException | ExecutionException e) {
                 LOGGER.error(e.getMessage(), e);
             }finally {
@@ -42,27 +41,11 @@ public class Main {
         }, EXECUTOR_SERVICE);
     }
 
-    private static CompletableFuture<Map<String, Integer>>[] getParametersFromClient(PrimitiveParser parser) {
-        LOGGER.info("Please enter parameters for EXPRESSION {}", EXPRESSION);
-        CompletableFuture<Map<String, Integer>>[] allParameters = new CompletableFuture[parser.getParameters().size()];
-        for (int i = 0; i < parser.getParameters().size(); i++) {
-            LOGGER.info(i +" parameter: ");
-            String parameterName = parser.getParameters().get(i);
-            allParameters[i] = parser.specifyParameter(parameterName)
-                    .exceptionally(e->{
-                        LOGGER.error(e.getMessage());
-                    return Collections.singletonMap(parameterName, 1);});
-        }
-        return allParameters;
-    }
-
-    private static String replaceParametersWithValues(PrimitiveParser parser, String expressionInPolishNotation,
-                                                      CompletableFuture<Map<String, Integer>>[] allParameters)
-            throws InterruptedException, ExecutionException {
-        for (int i = 0; i < parser.getParameters().size(); i++) {
-            String parameterName = parser.getParameters().get(i);
+    private static String replaceParametersWithValues(String expressionInPolishNotation,
+                                                      Map<String, Integer> allParametersAndValues){
+        for (String parameterName : allParametersAndValues.keySet()) {
             expressionInPolishNotation = expressionInPolishNotation.replace(parameterName,
-                    String.valueOf(allParameters[i].get().get(parameterName)));
+                    String.valueOf(allParametersAndValues.get(parameterName)));
         }
         return expressionInPolishNotation;
     }
